@@ -14,6 +14,6 @@ dotnet restore
 dotnet run
 ```
 
-The application will be available at `https://localhost:5001` by default. The index page displays a basic Todo List where you can add, toggle, and delete items. Data is persisted in a local **SQLite** database located in `todos.db`.
+The application will be available at `https://localhost:5001` by default. Users must log in before managing Todos. Three test accounts (`alice`, `bob`, `charlie`) are created automatically with the password `123456`. Data is stored in a local **SQLite** database located in `todos.db`.
 
 The views use [Bootstrap 5](https://getbootstrap.com/) for a responsive layout styled similarly to the **Front Dashboard** theme.
