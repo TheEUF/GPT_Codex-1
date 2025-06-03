@@ -1,11 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using TodoMvc.Data;
 using System.Threading.Tasks;
-
-namespace TodoMvc.Controllers
-{
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+                var hasher = new PasswordHasher<Models.User>();
+                var result = hasher.VerifyHashedPassword(user, user.Password, password);
+                if (result == PasswordVerificationResult.Success)
+                {
+                    HttpContext.Session.SetInt32("UserId", user.Id);
+                    HttpContext.Session.SetString("Username", user.Username);
+                    return RedirectToAction("Index", "Todo");
+                }
     public class AccountController : Controller
     {
         private readonly TodoContext _context;
