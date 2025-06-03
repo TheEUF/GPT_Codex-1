@@ -12,6 +12,7 @@ namespace TodoMvc.Data
         }
 
         public DbSet<TodoItem> Items => Set<TodoItem>();
+
         public DbSet<User> Users => Set<User>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,5 +25,6 @@ namespace TodoMvc.Data
                 new User { Id = 3, Username = "charlie", Password = "123456" }
             );
         }
+
     }
 }

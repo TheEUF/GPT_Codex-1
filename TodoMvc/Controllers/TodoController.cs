@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TodoMvc.Models;
 using TodoMvc.Data;
 using TodoMvc.Filters;
+using System.Threading.Tasks;
 
 namespace TodoMvc.Controllers
 {
@@ -21,6 +22,7 @@ namespace TodoMvc.Controllers
             var items = await _context.Items.Include(i => i.AssignedTo)
                 .AsNoTracking().ToListAsync();
             ViewBag.Users = await _context.Users.AsNoTracking().ToListAsync();
+
             return View(items);
         }
 
