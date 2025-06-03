@@ -1,61 +1,73 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using TodoMvc.Models;
+using TodoMvc.Data;
+using TodoMvc.Filters;
 
 namespace TodoMvc.Controllers
 {
+    [ServiceFilter(typeof(RequireLoginAttribute))]
     public class TodoController : Controller
     {
-        // In-memory store for simplicity
-        private static readonly List<TodoItem> Items = new();
-        private static int _nextId = 1;
+        private readonly TodoContext _context;
 
-        public IActionResult Index()
+        public TodoController(TodoContext context)
         {
-            return View(Items);
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var items = await _context.Items.Include(i => i.AssignedTo)
+                .AsNoTracking().ToListAsync();
+            ViewBag.Users = await _context.Users.AsNoTracking().ToListAsync();
+            return View(items);
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.Users = await _context.Users.AsNoTracking().ToListAsync();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string title)
+        public async Task<IActionResult> Create(string title, int assignedToId)
         {
             if (!string.IsNullOrWhiteSpace(title))
             {
-                Items.Add(new TodoItem
+                _context.Items.Add(new TodoItem
                 {
-                    Id = _nextId++,
                     Title = title,
-                    IsCompleted = false
+                    IsCompleted = false,
+                    AssignedToId = assignedToId
                 });
+                await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
-        public IActionResult Toggle(int id)
+        public async Task<IActionResult> Toggle(int id)
         {
-            var item = Items.FirstOrDefault(t => t.Id == id);
+            var item = await _context.Items.FindAsync(id);
             if (item != null)
             {
                 item.IsCompleted = !item.IsCompleted;
+                await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var item = Items.FirstOrDefault(t => t.Id == id);
+            var item = await _context.Items.FindAsync(id);
             if (item != null)
             {
-                Items.Remove(item);
+                _context.Items.Remove(item);
+                await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
