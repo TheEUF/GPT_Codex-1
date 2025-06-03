@@ -25,6 +25,5 @@ namespace TodoMvc.Data
                 new User { Id = 3, Username = "A03", Password = "123456" }
             );
         }
-
     }
 }
