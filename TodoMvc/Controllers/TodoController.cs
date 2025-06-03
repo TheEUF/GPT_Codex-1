@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TodoMvc.Models;
 using TodoMvc.Data;
+using TodoMvc.Filters;
 
 namespace TodoMvc.Controllers
 {
+    [ServiceFilter(typeof(RequireLoginAttribute))]
     public class TodoController : Controller
     {
         private readonly TodoContext _context;
@@ -16,26 +18,30 @@ namespace TodoMvc.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var items = await _context.Items.AsNoTracking().ToListAsync();
+            var items = await _context.Items.Include(i => i.AssignedTo)
+                .AsNoTracking().ToListAsync();
+            ViewBag.Users = await _context.Users.AsNoTracking().ToListAsync();
             return View(items);
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.Users = await _context.Users.AsNoTracking().ToListAsync();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string title)
+        public async Task<IActionResult> Create(string title, int assignedToId)
         {
             if (!string.IsNullOrWhiteSpace(title))
             {
                 _context.Items.Add(new TodoItem
                 {
                     Title = title,
-                    IsCompleted = false
+                    IsCompleted = false,
+                    AssignedToId = assignedToId
                 });
                 await _context.SaveChangesAsync();
             }
