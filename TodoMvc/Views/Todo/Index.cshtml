@@ -7,6 +7,14 @@
         <input type="text" name="title" class="form-control" placeholder="New todo" />
     </div>
     <div class="col-auto">
+        <select class="form-select" name="assignedToId">
+            @foreach (var u in (IEnumerable<TodoMvc.Models.User>)ViewBag.Users)
+            {
+                <option value="@u.Id">@u.Username</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
         <button type="submit" class="btn btn-primary">Add</button>
     </div>
 </form>
@@ -16,6 +24,7 @@
         <thead>
             <tr>
                 <th>Title</th>
+                <th>Assigned To</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -25,6 +34,7 @@
         {
             <tr>
                 <td>@item.Title</td>
+                <td>@item.AssignedTo?.Username</td>
                 <td>
                     @if (item.IsCompleted)
                     {
