@@ -5,6 +5,7 @@ using TodoMvc.Models;
 using TodoMvc.Data;
 using TodoMvc.Filters;
 
+
 namespace TodoMvc.Controllers
 {
     [ServiceFilter(typeof(RequireLoginAttribute))]
@@ -22,6 +23,7 @@ namespace TodoMvc.Controllers
             var items = await _context.Items.Include(i => i.AssignedTo)
                 .AsNoTracking().ToListAsync();
             ViewBag.Users = await _context.Users.AsNoTracking().ToListAsync();
+
             return View(items);
         }
 
